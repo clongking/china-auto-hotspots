@@ -101,7 +101,7 @@ HOTSPOTS_OFFLINE=1 npm run dev   # 完全离线，全部信源使用示例数据
 2. 移除 `src/app/api`（静态导出不支持 API Route），以 `NEXT_PUBLIC_STATIC_MODE=1` 和 `NEXT_PUBLIC_BASE_PATH=/<仓库名>` 执行 `next build` 生成 `out/`；
 3. 通过 `actions/deploy-pages` 发布。
 
-静态版前端直接读取快照 JSON，「手动刷新」按钮变为「重新加载」（只拉取最新快照），页面上会标注数据由 GitHub Actions 定时更新。首次使用需在仓库 Settings → Pages 中把 Source 设为 **GitHub Actions**。
+静态版前端直接读取快照 JSON，「手动刷新」按钮变为「重新加载」（只拉取最新快照），页面上会标注数据由 GitHub Actions 定时更新。工作流会通过 `actions/configure-pages` 自动启用 Pages（Source = GitHub Actions），无需手动设置。
 
 本地模拟静态构建：
 

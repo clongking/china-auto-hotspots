@@ -33,6 +33,11 @@ jobs:
 
       - run: npm ci
 
+      - name: 启用 GitHub Pages（首次运行时自动创建站点）
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - name: 抓取全部信源并生成数据快照
         env:
           SNAPSHOT_PREVIOUS_URL: https://${{ github.repository_owner }}.github.io${{ env.BASE_PATH }}/data/hotspots.json
