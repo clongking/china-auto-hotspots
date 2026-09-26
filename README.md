@@ -87,14 +87,34 @@ npm run dev        # http://localhost:43117
 ```bash
 npm run build && npm start   # 生产模式，同样监听 43117
 npm run lint
+npm run snapshot                 # 抓取并生成 public/data/hotspots.json（静态部署用）
 HOTSPOTS_OFFLINE=1 npm run dev   # 完全离线，全部信源使用示例数据
 ```
 
 首次打开页面会抓取全部信源（约 5~15 秒，取决于网络），之后走缓存。
 
+## 部署到 GitHub Pages（静态版）
+
+仓库自带 `.github/workflows/pages.yml`：推送到 `main`、每小时定时（cron）或手动触发时，GitHub Actions 会
+
+1. `npm run snapshot`：在 CI 中抓取全部信源并分析，写入 `public/data/hotspots.json`（会读取上一次已发布的快照来计算趋势）；
+2. 移除 `src/app/api`（静态导出不支持 API Route），以 `NEXT_PUBLIC_STATIC_MODE=1` 和 `NEXT_PUBLIC_BASE_PATH=/<仓库名>` 执行 `next build` 生成 `out/`；
+3. 通过 `actions/deploy-pages` 发布。
+
+静态版前端直接读取快照 JSON，「手动刷新」按钮变为「重新加载」（只拉取最新快照），页面上会标注数据由 GitHub Actions 定时更新。首次使用需在仓库 Settings → Pages 中把 Source 设为 **GitHub Actions**。
+
+本地模拟静态构建：
+
+```bash
+npm run snapshot
+mv src/app/api /tmp/api-bak && NEXT_PUBLIC_STATIC_MODE=1 NEXT_PUBLIC_BASE_PATH=/china-auto-hotspots npx next build; mv /tmp/api-bak src/app/api
+```
+
 ## 目录结构
 
 ```
+scripts/build-snapshot.mts   生成静态数据快照（GitHub Pages 用）
+.github/workflows/pages.yml  定时抓取 + 静态导出 + 发布到 Pages
 src/
   app/
     api/hotspots/route.ts   读取热点数据

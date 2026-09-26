@@ -17,13 +17,23 @@ export interface UseHotspotsResult {
 /** 自动轮询间隔：与服务端缓存 TTL 对齐，避免频繁抓取 */
 const POLL_INTERVAL_MS = 5 * 60_000;
 
+/** 静态部署模式：没有 API Route，直接读取构建时生成的 JSON 快照 */
+export const STATIC_MODE = process.env.NEXT_PUBLIC_STATIC_MODE === "1";
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const STATIC_DATA_URL = `${BASE_PATH}/data/hotspots.json`;
+
 async function readError(res: Response, fallback: string): Promise<string> {
   const body = (await res.json().catch(() => null)) as { error?: string } | null;
   return body?.error ?? fallback;
 }
 
-/** 纯请求函数：force 时先触发服务端重新抓取，再读取最新结果 */
+/** 纯请求函数：force 时先触发服务端重新抓取，再读取最新结果；静态模式只重新拉取快照 */
 async function fetchPayload(force: boolean, signal: AbortSignal): Promise<HotspotsPayload> {
+  if (STATIC_MODE) {
+    const res = await fetch(`${STATIC_DATA_URL}?t=${Date.now()}`, { signal, cache: "no-store" });
+    if (!res.ok) throw new Error(`快照文件加载失败（HTTP ${res.status}），请稍后重试`);
+    return (await res.json()) as HotspotsPayload;
+  }
   if (force) {
     const res = await fetch("/api/refresh", { method: "POST", signal });
     if (!res.ok) throw new Error(await readError(res, `刷新失败（HTTP ${res.status}）`));

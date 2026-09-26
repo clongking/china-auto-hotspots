@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { HotspotCard } from "./hotspot-card";
 import { BrandRanking, SourceStatusPanel, TopicDistribution } from "./side-panels";
 import { Timeline } from "./timeline";
-import { useHotspots } from "./use-hotspots";
+import { STATIC_MODE, useHotspots } from "./use-hotspots";
 
 function StatCard({
   icon: Icon,
@@ -125,7 +125,9 @@ function LoadingSkeleton() {
           <Skeleton className="h-80 rounded-xl" />
         </div>
       </div>
-      <p className="text-center text-sm text-muted-foreground">正在抓取 10 个信源并计算热度，首次加载约需 10 秒…</p>
+      <p className="text-center text-sm text-muted-foreground">
+        {STATIC_MODE ? "正在加载最新数据快照…" : "正在抓取 10 个信源并计算热度，首次加载约需 10 秒…"}
+      </p>
     </div>
   );
 }
@@ -176,7 +178,7 @@ export function Dashboard() {
           </div>
           <Button onClick={() => void refresh()} disabled={state === "loading" || refreshing}>
             <RefreshCw className={cn("size-4", refreshing && "animate-spin")} />
-            {refreshing ? "抓取中…" : "手动刷新"}
+            {refreshing ? (STATIC_MODE ? "加载中…" : "抓取中…") : STATIC_MODE ? "重新加载" : "手动刷新"}
           </Button>
         </div>
       </header>
@@ -205,7 +207,12 @@ export function Dashboard() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          {lastRefreshDurationMs !== null && state === "ready" && (
+          {STATIC_MODE && (
+            <p className="text-xs text-muted-foreground">
+              当前为静态部署版：数据快照由 GitHub Actions 定时抓取生成（约每小时一次），“重新加载”只会拉取最新快照。
+            </p>
+          )}
+          {!STATIC_MODE && lastRefreshDurationMs !== null && state === "ready" && (
             <p className="text-xs text-muted-foreground">
               本次手动刷新耗时 {(lastRefreshDurationMs / 1000).toFixed(1)} 秒，已重新抓取全部信源。
             </p>

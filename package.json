@@ -6,7 +6,9 @@
     "dev": "next dev -p 43117",
     "build": "next build",
     "start": "next start -p 43117",
-    "lint": "eslint"
+    "lint": "eslint",
+    "snapshot": "tsx --tsconfig tsconfig.json scripts/build-snapshot.mts",
+    "build:static": "NEXT_PUBLIC_STATIC_MODE=1 next build"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -27,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

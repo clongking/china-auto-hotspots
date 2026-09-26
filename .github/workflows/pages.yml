@@ -1,0 +1,62 @@
+name: 抓取热点并发布到 GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 每小时抓取一次（UTC），即北京时间每小时整点后 17 分
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  BASE_PATH: /${{ github.event.repository.name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 抓取全部信源并生成数据快照
+        env:
+          SNAPSHOT_PREVIOUS_URL: https://${{ github.repository_owner }}.github.io${{ env.BASE_PATH }}/data/hotspots.json
+        run: npm run snapshot
+
+      - name: 静态导出（移除不支持静态导出的 API Route）
+        env:
+          NEXT_PUBLIC_STATIC_MODE: "1"
+          NEXT_PUBLIC_BASE_PATH: ${{ env.BASE_PATH }}
+        run: |
+          rm -rf src/app/api
+          npx next build
+          touch out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
