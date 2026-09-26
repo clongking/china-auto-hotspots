@@ -6,7 +6,7 @@ interface BaiduEntry {
   title?: string;
   url?: string;
   desc?: string | string[];
-  hotScore?: string | number;
+  hotScore?: string | number | { value?: string | number; trend?: string; desc?: string };
   index?: number;
   isTop?: boolean;
 }
@@ -30,6 +30,17 @@ function flattenEntries(board: BaiduBoard): BaiduEntry[] {
     }
   }
   return out;
+}
+
+function hotScoreValue(h: BaiduEntry["hotScore"]): number | undefined {
+  const raw = typeof h === "object" && h !== null ? h.value : h;
+  const n = Number(String(raw ?? "").replace(/[^\d.]/g, ""));
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+}
+
+function hotScoreTrend(h: BaiduEntry["hotScore"]): string {
+  if (typeof h !== "object" || h === null || !h.trend) return "";
+  return h.trend === "up" ? "，热度上升" : h.trend === "down" ? "，热度下降" : "";
 }
 
 function descText(d: string | string[] | undefined): string | undefined {
@@ -70,7 +81,7 @@ export const baiduHotAdapter: SourceAdapter = {
           url: e.url || `https://www.baidu.com/s?wd=${encodeURIComponent(word)}`,
           summary: desc,
           publishedAt: now,
-          hotValue: e.hotScore ? Number(e.hotScore) : undefined,
+          hotValue: hotScoreValue(e.hotScore),
         });
       }
     }
@@ -88,9 +99,9 @@ export const baiduHotAdapter: SourceAdapter = {
           sourceId: "baidu-hot",
           title: `百度汽车热榜第 ${rank} 名：${name}${desc ? `（${desc}）` : ""}`,
           url: e.url || `https://www.baidu.com/s?wd=${encodeURIComponent(`${name} 汽车`)}`,
-          summary: `百度汽车榜车系搜索热度 ${e.hotScore ? Number(e.hotScore).toLocaleString("zh-CN") : "—"}`,
+          summary: `百度汽车榜热搜指数 ${hotScoreValue(e.hotScore)?.toLocaleString("zh-CN") ?? "—"}${hotScoreTrend(e.hotScore)}`,
           publishedAt: now,
-          hotValue: e.hotScore ? Number(e.hotScore) : undefined,
+          hotValue: hotScoreValue(e.hotScore),
         });
       });
     }

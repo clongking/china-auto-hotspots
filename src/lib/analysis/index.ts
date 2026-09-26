@@ -273,10 +273,12 @@ export function analyze(
     const prevScore = prevScores.length > 0 ? prevScores.reduce((a, b) => a + b, 0) / prevScores.length : undefined;
     const { trend, delta } = computeTrend(recent24, prior, score, prevScore);
 
+    // 摘要优先取代表条目；其次取非榜单条目的摘要或标题，避免用“日均关注度 xxx”这类模板文案
+    const others = members.filter((m) => m.item.id !== rep.item.id && !m.isRanked);
     const summaryCandidate =
       rep.item.summary ??
-      members.find((m) => m.item.id !== rep.item.id && m.item.summary)?.item.summary ??
-      members.find((m) => m.item.id !== rep.item.id)?.item.title ??
+      others.find((m) => m.item.summary)?.item.summary ??
+      others[0]?.item.title ??
       "";
 
     return {
@@ -356,9 +358,10 @@ export function analyze(
     .sort((a, b) => b.count - a.count || b.sourceCount - a.sourceCount)
     .slice(0, 15);
 
-  const timeline = [...items]
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-    .slice(0, 80);
+  // 时间线只放资讯与热搜词，榜单模板条目（懂车帝榜/百度汽车榜）只参与热度与品牌统计
+  const timeline = items
+    .filter((it) => !isRankedTitle(it.title))
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 
   const items24h = enriched.filter((e) => e.ageHours <= 24).length;
 

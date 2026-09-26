@@ -194,7 +194,7 @@ export function Dashboard() {
         </Alert>
       )}
 
-      {(state === "loading" || state === "idle") && !data && <LoadingSkeleton />}
+      {state === "loading" && !data && <LoadingSkeleton />}
 
       {data && filtered && (
         <div className="space-y-6">
@@ -247,8 +247,8 @@ export function Dashboard() {
           </section>
 
           <div className="grid gap-6 lg:grid-cols-3">
-            <section className="space-y-3 lg:col-span-2" aria-label="热点事件排行榜">
-              <div className="flex items-baseline justify-between">
+            <section className="min-w-0 space-y-3 lg:col-span-2" aria-label="热点事件排行榜">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                 <h2 className="text-lg font-semibold">热点事件排行榜</h2>
                 <span className="text-xs text-muted-foreground">热度分 = 提及量 × 跨信源覆盖 × 时间新鲜度</span>
               </div>
@@ -264,7 +264,7 @@ export function Dashboard() {
                 ))
               )}
             </section>
-            <aside className="space-y-6">
+            <aside className="min-w-0 space-y-6">
               <TopicDistribution topics={filtered.topics} />
               <BrandRanking brands={filtered.brands} />
               <SourceStatusPanel sources={data.sources} />

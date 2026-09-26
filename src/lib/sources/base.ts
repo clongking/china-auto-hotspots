@@ -5,7 +5,10 @@ export interface SourceAdapter extends SourceMeta {
   fetch(): Promise<NewsItem[]>;
 }
 
-export const DEFAULT_TIMEOUT_MS = 12_000;
+export const DEFAULT_TIMEOUT_MS = 10_000;
+
+/** 网络层错误（连接超时、DNS 等）重试一次；HTTP 4xx/5xx 不重试 */
+const NETWORK_RETRIES = 1;
 
 const BROWSER_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
@@ -15,6 +18,26 @@ export async function fetchWithTimeout(
   init: RequestInit = {},
   timeoutMs = DEFAULT_TIMEOUT_MS,
 ): Promise<Response> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= NETWORK_RETRIES; attempt++) {
+    try {
+      return await fetchOnce(url, init, timeoutMs);
+    } catch (err) {
+      lastErr = err;
+      if (err instanceof HttpError) throw err;
+    }
+  }
+  throw lastErr;
+}
+
+export class HttpError extends Error {
+  constructor(public readonly status: number) {
+    super(`HTTP ${status}`);
+    this.name = "HttpError";
+  }
+}
+
+async function fetchOnce(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -30,7 +53,7 @@ export async function fetchWithTimeout(
       },
     });
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
+      throw new HttpError(res.status);
     }
     return res;
   } finally {

@@ -14,9 +14,15 @@ export const autohomeAdapter: SourceAdapter = {
   name: "汽车之家",
   homepage: "https://www.autohome.com.cn/all/",
   kind: "html",
-  description: "汽车之家资讯“全部”频道页（GB2312 编码 HTML），解析标题、摘要与相对时间",
+  description: "汽车之家资讯“全部”频道页（GB2312 编码 HTML），解析标题、摘要与相对时间；不可达时退到新闻频道页",
   async fetch(): Promise<NewsItem[]> {
-    const html = await fetchText("https://www.autohome.com.cn/all/", { encoding: "gb2312" });
+    // 汽车之家对单 IP 偶发连接挂起，两个列表页并发请求，任一成功即可
+    const html = await Promise.any([
+      fetchText("https://www.autohome.com.cn/all/", { encoding: "gb2312" }),
+      fetchText("https://www.autohome.com.cn/news/", { encoding: "gb2312" }),
+    ]).catch((err: AggregateError) => {
+      throw err.errors?.[0] ?? err;
+    });
     const flat = html.replace(/[\r\n]+/g, " ");
     const now = new Date();
     const items: NewsItem[] = [];

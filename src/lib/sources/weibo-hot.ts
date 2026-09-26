@@ -71,8 +71,10 @@ export const weiboHotAdapter: SourceAdapter = {
       }
     }
 
-    if (band.status === "rejected" && mobile.status === "rejected") {
-      throw new Error("微博热搜接口拒绝访问（需要访客 Cookie）");
+    const bandOk = band.status === "fulfilled" && band.value.ok === 1;
+    const mobileOk = mobile.status === "fulfilled" && mobile.value.ok === 1;
+    if (!bandOk && !mobileOk) {
+      throw new Error("微博热搜接口拒绝访问（需要登录或访客 Cookie）");
     }
     return items;
   },

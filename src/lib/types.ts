@@ -92,6 +92,7 @@ export interface HotspotsPayload {
   hotspots: Hotspot[];
   topics: TopicStat[];
   brands: BrandStat[];
+  /** 窗口期内全部资讯，按发布时间倒序（含分析阶段标注的品牌/话题，供前端按信源筛选时重算统计） */
   timeline: NewsItem[];
   sources: SourceRunResult[];
   stats: {

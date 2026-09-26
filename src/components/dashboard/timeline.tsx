@@ -27,7 +27,7 @@ export function Timeline({ items }: { items: NewsItem[] }) {
     <Card>
       <CardHeader>
         <CardTitle>近期时间线</CardTitle>
-        <CardDescription>各信源最新资讯按发布时间倒序，榜单类条目按榜单更新时间计</CardDescription>
+        <CardDescription>共 {items.length} 条资讯与热搜词，按发布时间倒序（不含懂车帝、百度汽车榜的车系榜单行）</CardDescription>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (

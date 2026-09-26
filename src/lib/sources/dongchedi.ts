@@ -77,7 +77,7 @@ export const dongchediAdapter: SourceAdapter = {
           sourceId: "dongchedi",
           title: `懂车帝销量榜第 ${e.rank} 名：${seriesLabel(e)} 销量 ${e.count.toLocaleString("zh-CN")} 辆`,
           url,
-          summary: `${e.text ?? "近期销量"}${e.price ? `，指导价 ${e.price}` : ""}`,
+          summary: `${e.text || "上月销量"}${e.price ? `，指导价 ${e.price}` : ""}`,
           publishedAt: now.toISOString(),
           hotValue: e.count,
         });

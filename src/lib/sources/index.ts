@@ -28,7 +28,7 @@ export const SOURCE_ADAPTERS: SourceAdapter[] = [
 
 export const SOURCE_IDS: SourceId[] = SOURCE_ADAPTERS.map((a) => a.id);
 
-const SOURCE_TIMEOUT_MS = 20_000;
+const SOURCE_TIMEOUT_MS = 25_000;
 
 /** 单个信源最少需要多少条有效结果才视为“在线”，否则回退到示例数据 */
 const MIN_LIVE_ITEMS = 3;
@@ -94,10 +94,19 @@ async function runAdapter(adapter: SourceAdapter): Promise<{ items: NewsItem[]; 
         itemCount: mock.length,
         durationMs: Date.now() - started,
         fetchedAt: new Date().toISOString(),
-        error: err instanceof Error ? err.message : String(err),
+        error: describeError(err),
       },
     };
   }
+}
+
+function describeError(err: unknown): string {
+  if (!(err instanceof Error)) return String(err);
+  const cause = (err as Error & { cause?: { code?: string; message?: string } }).cause;
+  if (err.name === "AbortError") return "请求超时";
+  if (cause?.code) return `${err.message}（${cause.code}）`;
+  if (cause?.message) return `${err.message}（${cause.message}）`;
+  return err.message;
 }
 
 export async function collectAllSources(): Promise<CollectResult> {
