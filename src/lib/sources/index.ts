@@ -30,8 +30,9 @@ export const SOURCE_IDS: SourceId[] = SOURCE_ADAPTERS.map((a) => a.id);
 
 const SOURCE_TIMEOUT_MS = 25_000;
 
-/** 单个信源最少需要多少条有效结果才视为“在线”，否则回退到示例数据 */
+/** 单个信源最少需要多少条有效结果才视为“在线”，否则回退到示例数据；热搜榜里汽车词条本就稀少，有 1 条即算在线 */
 const MIN_LIVE_ITEMS = 3;
+const MIN_LIVE_ITEMS_HOTLIST = 1;
 
 /** 单信源最多保留的条目数（取最新），避免单一信源主导热度 */
 const MAX_ITEMS_PER_SOURCE = 80;
@@ -60,7 +61,8 @@ async function runAdapter(adapter: SourceAdapter): Promise<{ items: NewsItem[]; 
       .filter((it) => it.title && it.url && it.publishedAt)
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
       .slice(0, MAX_ITEMS_PER_SOURCE);
-    if (valid.length < MIN_LIVE_ITEMS) {
+    const minLive = adapter.kind === "hotlist" ? MIN_LIVE_ITEMS_HOTLIST : MIN_LIVE_ITEMS;
+    if (valid.length < minLive) {
       const mock = getMockItems(adapter.id);
       return {
         items: mock,
