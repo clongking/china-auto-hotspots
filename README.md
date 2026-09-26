@@ -99,9 +99,9 @@ HOTSPOTS_OFFLINE=1 npm run dev   # 完全离线，全部信源使用示例数据
 
 1. `npm run snapshot`：在 CI 中抓取全部信源并分析，写入 `public/data/hotspots.json`（会读取上一次已发布的快照来计算趋势）；
 2. 移除 `src/app/api`（静态导出不支持 API Route），以 `NEXT_PUBLIC_STATIC_MODE=1` 和 `NEXT_PUBLIC_BASE_PATH=/<仓库名>` 执行 `next build` 生成 `out/`；
-3. 通过 `actions/deploy-pages` 发布。
+3. 用 `peaceiris/actions-gh-pages` 把 `out/` 推送到 `gh-pages` 分支，由 GitHub Pages（Source: `gh-pages` / root）托管。
 
-静态版前端直接读取快照 JSON，「手动刷新」按钮变为「重新加载」（只拉取最新快照），页面上会标注数据由 GitHub Actions 定时更新。工作流会通过 `actions/configure-pages` 自动启用 Pages（Source = GitHub Actions），无需手动设置。
+静态版前端直接读取快照 JSON，「手动刷新」按钮变为「重新加载」（只拉取最新快照），页面上会标注数据由 GitHub Actions 定时更新。公开仓库首次出现 `gh-pages` 分支时 GitHub 会自动启用 Pages，无需 Pages API 管理权限；若未自动启用，可在 Settings → Pages 中把 Source 设为 `gh-pages` 分支。
 
 本地模拟静态构建：
 

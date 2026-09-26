@@ -8,10 +8,10 @@ on:
     - cron: "17 * * * *"
   workflow_dispatch:
 
+# 静态产物推送到 gh-pages 分支，由 GitHub Pages（Source: gh-pages / root）托管。
+# 这种方式不需要 Pages API 的管理权限，首次推送 gh-pages 分支会自动启用 Pages。
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
@@ -21,7 +21,7 @@ env:
   BASE_PATH: /${{ github.event.repository.name }}
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,11 +32,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-
-      - name: 启用 GitHub Pages（首次运行时自动创建站点）
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: 抓取全部信源并生成数据快照
         env:
@@ -52,16 +47,11 @@ jobs:
           npx next build
           touch out/.nojekyll
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: 发布到 gh-pages 分支
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: out
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "deploy: 静态导出 ${{ github.sha }}"
