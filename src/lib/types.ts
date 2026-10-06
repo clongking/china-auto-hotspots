@@ -8,9 +8,12 @@ export type SourceId =
   | "chedongxi"
   | "ithome"
   | "baidu-hot"
-  | "weibo-hot";
+  | "weibo-hot"
+  | "wechat"
+  | "weibo-topic"
+  | "bilibili";
 
-export type SourceKind = "api" | "rss" | "html" | "hotlist";
+export type SourceKind = "api" | "rss" | "html" | "hotlist" | "social";
 
 export interface SourceMeta {
   id: SourceId;

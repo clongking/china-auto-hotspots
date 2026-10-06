@@ -11,6 +11,9 @@ import { ithomeAdapter } from "./ithome";
 import { kr36Adapter } from "./kr36";
 import { sinaAutoAdapter } from "./sina-auto";
 import { weiboHotAdapter } from "./weibo-hot";
+import { bilibiliAdapter } from "./bilibili";
+import { wechatAdapter } from "./wechat";
+import { weiboTopicAdapter } from "./weibo-topic";
 
 /** 注册新信源：实现 SourceAdapter 并加入此数组即可 */
 export const SOURCE_ADAPTERS: SourceAdapter[] = [
@@ -24,15 +27,25 @@ export const SOURCE_ADAPTERS: SourceAdapter[] = [
   ithomeAdapter,
   baiduHotAdapter,
   weiboHotAdapter,
+  wechatAdapter,
+  weiboTopicAdapter,
+  bilibiliAdapter,
 ];
 
 export const SOURCE_IDS: SourceId[] = SOURCE_ADAPTERS.map((a) => a.id);
 
 const SOURCE_TIMEOUT_MS = 25_000;
 
-/** 单个信源最少需要多少条有效结果才视为“在线”，否则回退到示例数据；热搜榜里汽车词条本就稀少，有 1 条即算在线 */
+/** 单个信源最少需要多少条有效结果才视为“在线”；热搜榜/社交类汽车内容稀少，阈值更低 */
 const MIN_LIVE_ITEMS = 3;
 const MIN_LIVE_ITEMS_HOTLIST = 1;
+const MIN_LIVE_ITEMS_SOCIAL = 1;
+
+function minLiveFor(adapter: SourceAdapter): number {
+  if (adapter.kind === "hotlist") return MIN_LIVE_ITEMS_HOTLIST;
+  if (adapter.kind === "social") return MIN_LIVE_ITEMS_SOCIAL;
+  return MIN_LIVE_ITEMS;
+}
 
 /** 单信源最多保留的条目数（取最新），避免单一信源主导热度 */
 const MAX_ITEMS_PER_SOURCE = 80;
@@ -61,8 +74,7 @@ async function runAdapter(adapter: SourceAdapter): Promise<{ items: NewsItem[]; 
       .filter((it) => it.title && it.url && it.publishedAt)
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
       .slice(0, MAX_ITEMS_PER_SOURCE);
-    const minLive = adapter.kind === "hotlist" ? MIN_LIVE_ITEMS_HOTLIST : MIN_LIVE_ITEMS;
-    if (valid.length < minLive) {
+    if (valid.length < minLiveFor(adapter)) {
       const mock = getMockItems(adapter.id);
       return {
         items: mock,

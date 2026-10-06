@@ -11,6 +11,9 @@ export const SOURCE_NAMES: Record<SourceId, string> = {
   ithome: "IT之家·车",
   "baidu-hot": "百度热搜",
   "weibo-hot": "微博热搜",
+  wechat: "微信公众号",
+  "weibo-topic": "微博话题",
+  bilibili: "bilibili 汽车热榜",
 };
 
 export const SOURCE_SHORT: Record<SourceId, string> = {
@@ -24,6 +27,9 @@ export const SOURCE_SHORT: Record<SourceId, string> = {
   ithome: "IT之家",
   "baidu-hot": "百度",
   "weibo-hot": "微博",
+  wechat: "微信",
+  "weibo-topic": "微博话题",
+  bilibili: "B站",
 };
 
 export const TOPIC_COLORS: Record<string, string> = {

@@ -228,7 +228,9 @@ export function analyze(
     for (const m of c.members) {
       freshness += Math.exp(-m.ageHours / 24);
       if (m.item.hotValue) {
-        hot += m.item.hotValue / (maxHotBySource.get(m.item.sourceId) ?? m.item.hotValue);
+        // 用 log2 压缩播放量/热度值的巨大差异，再按信源内最大值归一化
+        const hv = Math.log2(1 + m.item.hotValue);
+        hot += hv / Math.log2(1 + (maxHotBySource.get(m.item.sourceId) ?? m.item.hotValue));
       }
     }
     return { c, mentions, sourcesN, freshness, hot };
@@ -248,11 +250,11 @@ export function analyze(
   }
 
   const hotspots: Hotspot[] = rawScores.map(({ c, mentions, sourcesN, freshness, hot }) => {
-    const wHot = hasHot ? 0.1 : 0;
+    const wHot = hasHot ? 0.15 : 0;
     const raw =
-      (0.3 + (hasHot ? 0 : 0.05)) * (mentions / mMax) +
-      (0.3 + (hasHot ? 0 : 0.05)) * (sourcesN / sMax) +
-      0.3 * (freshness / fMax) +
+      (0.3 + (hasHot ? 0 : 0.025)) * (mentions / mMax) +
+      (0.3 + (hasHot ? 0 : 0.025)) * (sourcesN / sMax) +
+      (hasHot ? 0.25 : 0.3) * (freshness / fMax) +
       wHot * (hot / hMax);
     const score = Math.round(raw * 1000) / 10;
 

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { HotspotCard } from "./hotspot-card";
 import { BrandRanking, SourceStatusPanel, TopicDistribution } from "./side-panels";
 import { Timeline } from "./timeline";
+import { SocialFeeds } from "./social-feeds";
 import { STATIC_MODE, useHotspots } from "./use-hotspots";
 
 function StatCard({
@@ -224,6 +225,8 @@ export function Dashboard() {
             <StatCard icon={Rss} label="在线信源" value={`${data.stats.liveSources} / ${data.sources.length}`} hint={data.stats.mockSources > 0 ? `${data.stats.mockSources} 个使用示例数据` : "全部实时抓取"} tone="bg-chart-3/15 text-chart-3" />
             <StatCard icon={Activity} label="上升中" value={String(filtered.hotspots.filter((h) => h.trend === "up").length)} hint={`下降 ${filtered.hotspots.filter((h) => h.trend === "down").length} 个`} tone="bg-chart-2/15 text-chart-2" />
           </section>
+
+          <SocialFeeds data={data.timeline} />
 
           <section aria-label="按信源筛选" className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">

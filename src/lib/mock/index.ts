@@ -105,6 +105,28 @@ const MOCK_SEEDS: Record<SourceId, MockSeed[]> = {
     { title: "大众召回286万辆", url: "https://s.weibo.com/weibo?q=%23%E5%A4%A7%E4%BC%97%E5%8F%AC%E5%9B%9E%23", hoursAgo: 14, hotValue: 1520000 },
     { title: "特斯拉ModelYL开始交付", url: "https://s.weibo.com/weibo?q=%23ModelYL%23", hoursAgo: 37, hotValue: 980000 },
   ],
+  wechat: [
+    { title: "比亚迪海豹06：限时权益价 9.98 万起，重新定调 10 万级插混市场", url: "https://mp.weixin.qq.com/mock/byd-seal-06", summary: "某汽车公众号：月销破 3 万后，比亚迪把智驾下放至 10 万元级。", hoursAgo: 4 },
+    { title: "华为智驾首搭东风奕境，激光雷达 + ADS 4.0 进入 20 万级", url: "https://mp.weixin.qq.com/mock/dongfeng-yijing-ads", summary: "某汽车公众号：余承东透露，四季度将有 5 个品牌上车华为乾崑智驾。", hoursAgo: 8 },
+    { title: "欧盟对中国电动车反补贴税落地三个月后，中企建厂路线变清晰了", url: "https://mp.weixin.qq.com/mock/eu-tariff", summary: "某汽车公众号：比亚迪匈牙利、宁德时代德国项目提速，本地化被视作唯一出路。", hoursAgo: 18 },
+    { title: "小米汽车第二款车 YU7 产能爬坡，雷军称二期工厂 24 小时满产", url: "https://mp.weixin.qq.com/mock/xiaomi-yu7", summary: "某汽车公众号：YU7 累计锁单 18 万，月交付目标站上 3 万辆。", hoursAgo: 22 },
+    { title: "特斯拉 Model Y 焕新版进店，尾款立减 7000 元，价格战再燃", url: "https://mp.weixin.qq.com/mock/tesla-model-y", summary: "某汽车公众号：国庆前多家车企推限时权益，四季度开场即降。", hoursAgo: 28 },
+  ],
+  "weibo-topic": [
+    { title: "微博话题：#新能源汽车#", url: "https://s.weibo.com/weibo?q=%23%E6%96%B0%E8%83%BD%E6%BA%90%E6%B1%BD%E8%BD%A6%23", hoursAgo: 1, hotValue: 2840000 },
+    { title: "微博话题：#智能驾驶#", url: "https://s.weibo.com/weibo?q=%23%E6%99%BA%E8%83%BD%E9%A9%BE%E9%A9%B6%23", hoursAgo: 1, hotValue: 1960000 },
+    { title: "微博话题：#汽车价格战#", url: "https://s.weibo.com/weibo?q=%23%E6%B1%BD%E8%BD%A6%E4%BB%B7%E6%A0%BC%E6%88%98%23", hoursAgo: 1, hotValue: 1520000 },
+    { title: "微博话题：#比亚迪降价#", url: "https://s.weibo.com/weibo?q=%23%E6%AF%94%E4%BA%9A%E8%BF%AA%E9%99%8D%E4%BB%B7%23", hoursAgo: 1, hotValue: 1210000 },
+    { title: "微博话题：#尊界SUV广州车展发布#", url: "https://s.weibo.com/weibo?q=%23%E5%B0%8A%E7%95%8CSUV%E5%B9%BF%E5%B7%9E%E8%BD%A6%E5%B1%95%E5%8F%91%E5%B8%83%23", hoursAgo: 1, hotValue: 980000 },
+  ],
+  bilibili: [
+    { title: "1100 匹马力，27.98 万！比亚迪汉 L 开起来有多疯狂？", url: "https://www.bilibili.com/video/BV1XddPYjEq7", summary: "UP：极速拍档 · 播放量 1,390,798 · 弹幕 11,141 · 综合得分 304,862", hoursAgo: 6, hotValue: 304862 },
+    { title: "我一定要让老外，都羡慕中国车！【宝骏享境】", url: "https://www.bilibili.com/video/BV1BqRUY5Eva", summary: "UP：极速拍档 · 播放量 853,112 · 弹幕 5,128 · 综合得分 367,022", hoursAgo: 10, hotValue: 367022 },
+    { title: "上海街头开 007 特工超跑，有多帅？", url: "https://www.bilibili.com/video/BV17vRUY1EUa", summary: "UP：极速拍档 · 播放量 976,169 · 弹幕 3,819 · 综合得分 490,472", hoursAgo: 12, hotValue: 490472 },
+    { title: "华为 ADS 4.0 智驾实测：城市 NOA 比老司机还稳？", url: "https://www.bilibili.com/video/BV1MockHuawei", summary: "UP：键盘车神教 · 播放量 620,000 · 弹幕 4,200", hoursAgo: 18, hotValue: 620000 },
+    { title: "拆解小米 YU7：底盘用料比 Model Y 强在哪？", url: "https://www.bilibili.com/video/BV1MockXiaomi", summary: "UP：一鹿有车 · 播放量 540,000 · 弹幕 3,100", hoursAgo: 26, hotValue: 540000 },
+  ],
+
 };
 
 export function getMockItems(sourceId: SourceId, now = new Date()): NewsItem[] {
